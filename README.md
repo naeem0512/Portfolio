@@ -1,40 +1,41 @@
 ## Projects
 
 ### Sign-Language Detection
-This project leverages machine learning to enable the detection of sign language gestures. I actively contributed to the programming aspects, crafting algorithms to improve detection accuracy. Additionally, I was involved in the collection of datasets which were vital for training our models.
+**Project Overview:**
+Imagine a world where communication barriers are shattered and inclusivity is the norm. This project aims to bridge the gap between the hearing and the hearing-impaired communities by leveraging cutting-edge technology. By using machine learning, we’ve developed a system that can accurately detect and interpret sign language gestures in real-time. This innovation has the potential to transform how we interact, making communication seamless and more accessible for everyone.
+
+I worked with five incredible teammates to make this project a reality, and our efforts secured us 2nd place at our university's 'Innovation Fest'!
 
 - **Technologies Used:** Python, Machine Learning, OpenCV
 - **My Contributions:**
   - Programming of detection algorithms
-  - Collection and preprocessing of dataset
+  - Collecting and preprocessing invaluable datasets to train our models
+  - Ensuring real-time performance for practical usability
 - **GitHub Repo:** [Sign-Language Detection](https://github.com/naeem0512/Sign-Language)
 
 ---
 
-### Data Visualization Assessment
+### Data Visualization of Global Terror Attacks
 **Project Overview:**
-Data tells a story, and with the right tools, we can uncover the narratives hidden within. This project is all about turning raw data into compelling visual stories that drive insights and decision-making.
+Data tells a story, and with the right tools, we can uncover the narratives hidden within. This project focuses on exploring global terror attacks through data visualization. Additionally, a 'shiny' app was created to allow users to interactively explore features of the data around the world.
 
-- **Technologies Used**: R, Data Visualization
+- **Technologies Used**: R, Shiny, Data Visualization
 - **My Contributions**:
   - Conducting thorough data analysis using R
   - Creating insightful visualizations that make data speak
+  - Developing a 'shiny' app for interactive data exploration
 
-#### Files
-- [World Bank Population Data](./API_SP.POP.TOTL_DS2_en_csv_v2_344555.csv): Used to compare terror attacks with country populations for a fair ratio analysis.
+#### Report and Script
 - [R Project File](./Assessment%202%20-%20Data%20Visualisation.Rproj): The project file for RStudio.
 - [Data Visualization Report](./Assessment_2_Data_VisualisationReport.pdf): A comprehensive report detailing the findings and visualizations.
 - [R Script](./Assessment2.R): The script containing all data processing and visualization code.
 
----
+#### Data Files
+**These files were used to explore and analyze the data:**
 
-### Global Terrorism Database (from Kaggle)
-**Project Overview:**
-Understanding global terrorism trends is crucial for developing strategies to combat threats. This extensive database provides deep insights into terrorist activities worldwide.
+#### Global Terrorism Database (from Kaggle)
+The Global Terrorism Database is a large dataset that was too big to upload as a single file on GitHub. Therefore, it has been split into smaller chunks for easier handling and upload. Below are the links to each chunk of the dataset:
 
-Due to the size of this dataset, it has been split into manageable chunks for easier handling.
-
-#### Chunked Data Files
 - [Part 1](./csv_chunks/globalterrorismdb_0718dist_part1.csv)
 - [Part 2](./csv_chunks/globalterrorismdb_0718dist_part2.csv)
 - [Part 3](./csv_chunks/globalterrorismdb_0718dist_part3.csv)
@@ -52,10 +53,10 @@ Due to the size of this dataset, it has been split into manageable chunks for ea
 - [Part 15](./csv_chunks/globalterrorismdb_0718dist_part15.csv)
 - [Part 16](./csv_chunks/globalterrorismdb_0718dist_part16.csv)
 
-### Additional Data
+
 #### Population Data (from World Bank)
 The population data from the World Bank was utilized to compare the number of terror attacks with the population of each country, allowing for a fair ratio analysis and deeper insights.
-
+- [World Bank Population Data](./API_SP.POP.TOTL_DS2_en_csv_v2_344555.csv): Used to compare terror attacks with country populations for a fair ratio analysis.
 ---
 
 ### Note
