@@ -15,6 +15,8 @@ I worked with five incredible teammates to make this project a reality, and our 
 
 ---
 
+
+
 ### Data Visualization of Global Terror Attacks
 **Project Overview:**
 Data tells a story, and with the right tools, we can uncover the narratives hidden within. This project focuses on exploring global terror attacks through data visualization. Additionally, a 'shiny' app was created to allow users to interactively explore features of the data around the world.
