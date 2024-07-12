@@ -1,0 +1,351 @@
+<!doctype html>
+<html lang="en-US">
+<head>
+    <meta charset="utf-8" />
+    <title>Gamedev Phaser Workshop - Extended Version</title>
+    <style>
+      * {
+        padding: 0;
+        margin: 0;
+      }
+    </style>
+    <script src="js/phaser.min.js"></script>
+</head>
+<body>
+    <script>
+      const game = new Phaser.Game(480, 320, Phaser.CANVAS, null, {
+        preload,
+        create,
+        update,
+      });
+
+      let balls;
+      let paddle;
+      let bricks;
+      let newBrick;
+      let brickInfo;
+      let scoreText;
+      let score = 0;
+      let lives = 3;
+      let livesText;
+      let lifeLostText;
+      let playing = false;
+      let startButton;
+      let backgroundColors = ['#eee', '#f39c12', '#8e44ad', '#2ecc71', '#3498db'];
+      let currentLevel = 0;
+      let highScore = localStorage.getItem('highScore') || 0;
+      let powerUps;
+      const powerUpTypes = ['extraLife', 'largerPaddle', 'multiBall'];
+      const levels = [
+        // Level 1
+        {
+          brickLayout: [
+            [1, 1, 1, 1, 1, 1, 1],
+            [1, 1, 1, 1, 1, 1, 1],
+            [1, 1, 1, 1, 1, 1, 1],
+          ],
+        },
+        // Level 2
+        {
+          brickLayout: [
+            [1, 0, 1, 0, 1, 0, 1],
+            [0, 1, 0, 1, 0, 1, 0],
+            [1, 0, 1, 0, 1, 0, 1],
+          ],
+        },
+        // Level 3
+        {
+          brickLayout: [
+            [1, 1, 1, 1, 1, 1, 1],
+            [1, 0, 0, 0, 0, 0, 1],
+            [1, 1, 1, 1, 1, 1, 1],
+          ],
+        },
+        // Level 4
+        {
+          brickLayout: [
+            [1, 1, 1, 1, 1, 1, 1],
+            [1, 1, 0, 0, 0, 1, 1],
+            [1, 1, 1, 1, 1, 1, 1],
+          ],
+        },
+        // Level 5
+        {
+          brickLayout: [
+            [0, 1, 1, 1, 1, 1, 0],
+            [1, 1, 0, 0, 0, 1, 1],
+            [1, 1, 1, 1, 1, 1, 1],
+          ],
+        },
+        // Level 6
+        {
+          brickLayout: [
+            [1, 1, 1, 0, 1, 1, 1],
+            [0, 1, 1, 1, 1, 1, 0],
+            [1, 0, 0, 1, 0, 0, 1],
+          ],
+        },
+        // Level 7
+        {
+          brickLayout: [
+            [1, 1, 1, 1, 1, 1, 1],
+            [0, 0, 0, 0, 0, 0, 0],
+            [1, 1, 1, 1, 1, 1, 1],
+          ],
+        },
+        // Level 8
+        {
+          brickLayout: [
+            [0, 1, 0, 1, 0, 1, 0],
+            [1, 0, 1, 0, 1, 0, 1],
+            [0, 1, 0, 1, 0, 1, 0],
+          ],
+        },
+        // Level 9
+        {
+          brickLayout: [
+            [1, 1, 1, 1, 1, 1, 1],
+            [1, 1, 1, 1, 1, 1, 1],
+            [1, 1, 1, 1, 1, 1, 1],
+            [1, 1, 1, 1, 1, 1, 1],
+          ],
+        },
+        // Level 10
+        {
+          brickLayout: [
+            [1, 0, 1, 0, 1, 0, 1],
+            [0, 1, 0, 1, 0, 1, 0],
+            [1, 0, 1, 0, 1, 0, 1],
+            [0, 1, 0, 1, 0, 1, 0],
+          ],
+        },
+      ];
+
+      function preload() {
+        game.scale.scaleMode = Phaser.ScaleManager.SHOW_ALL;
+        game.scale.pageAlignHorizontally = true;
+        game.scale.pageAlignVertically = true;
+        game.stage.backgroundColor = '#eee';
+        game.load.image('ball', 'img/ball.png');
+        game.load.image('paddle', 'img/paddle.png');
+        game.load.image('brick', 'img/brick.png');
+        game.load.image('extraLife', 'img/extraLife.png');
+        game.load.image('largerPaddle', 'img/largerPaddle.png');
+        game.load.image('multiBall', 'img/multiBall.png');
+        game.load.spritesheet('button', 'img/button.png', 120, 40);
+        game.load.audio('hit', 'audio/hit.wav');
+        game.load.audio('brickHit', 'audio/brickHit.wav');
+        game.load.audio('loseLife', 'audio/loseLife.wav');
+        game.load.audio('gameOver', 'audio/gameOver.wav');
+        game.load.audio('backgroundMusic', 'audio/backgroundMusic.mp3');
+      }
+
+      function create() {
+        game.physics.startSystem(Phaser.Physics.ARCADE);
+        game.physics.arcade.checkCollision.down = false;
+
+        balls = game.add.group();
+        balls.enableBody = true;
+        balls.physicsBodyType = Phaser.Physics.ARCADE;
+
+        createBall(game.world.width * 0.5, game.world.height - 25);
+
+        paddle = game.add.sprite(game.world.width * 0.5, game.world.height - 5, 'paddle');
+        paddle.anchor.set(0.5, 1);
+        game.physics.enable(paddle, Phaser.Physics.ARCADE);
+        paddle.body.immovable = true;
+
+        powerUps = game.add.group();
+        powerUps.enableBody = true;
+        powerUps.physicsBodyType = Phaser.Physics.ARCADE;
+
+        let textStyle = { font: "18px Arial", fill: "#0095DD" };
+
+        scoreText = game.add.text(5, 5, `Points: ${score}`, textStyle);
+        livesText = game.add.text(game.world.width - 5, 5, `Lives: ${lives}`, textStyle);
+        livesText.anchor.set(1, 0);
+        lifeLostText = game.add.text(game.world.width * 0.5, game.world.height * 0.5, "Life lost, click to continue", textStyle);
+        lifeLostText.anchor.set(0.5);
+        lifeLostText.visible = false;
+        highScoreText = game.add.text(5, 25, `High Score: ${highScore}`, textStyle);
+
+        startButton = game.add.button(
+            game.world.width * 0.5,
+            game.world.height * 0.5,
+            "button",
+            startGame,
+            this,
+            1,
+            0,
+            2,
+        );
+        startButton.anchor.set(0.5);
+
+        initBricks();
+
+        backgroundMusic = game.add.audio('backgroundMusic');
+        backgroundMusic.loop = true;
+        backgroundMusic.play();
+      }
+
+      function update() {
+        game.physics.arcade.collide(balls, paddle, ballHitPaddle);
+        game.physics.arcade.collide(balls, bricks, ballHitBrick);
+        game.physics.arcade.overlap(paddle, powerUps, collectPowerUp, null, this);
+        if (playing) {
+            paddle.x = game.input.x || game.world.width * 0.5;
+        }
+      }
+
+      function createBall(x, y) {
+        let ball = balls.create(x, y, 'ball');
+        ball.anchor.set(0.5);
+        game.physics.arcade.enable(ball);
+        ball.body.collideWorldBounds = true;
+        ball.body.bounce.set(1);
+        ball.checkWorldBounds = true;
+        ball.events.onOutOfBounds.add(ballLeaveScreen, this);
+        return ball;
+      }
+
+      function initBricks() {
+        brickInfo = {
+          width: 50,
+          height: 20,
+          count: {
+            row: levels[currentLevel].brickLayout.length,
+            col: levels[currentLevel].brickLayout[0].length
+          },
+          offset: {
+            top: 50,
+            left: 60
+          },
+          padding: 10
+        };
+        bricks = game.add.group();
+        for (let r = 0; r < brickInfo.count.row; r++) {
+          for (let c = 0; c < brickInfo.count.col; c++) {
+            if (levels[currentLevel].brickLayout[r][c] === 1) {
+              var brickX = (c * (brickInfo.width + brickInfo.padding)) + brickInfo.offset.left;
+              var brickY = (r * (brickInfo.height + brickInfo.padding)) + brickInfo.offset.top;
+              newBrick = game.add.sprite(brickX, brickY, 'brick');
+              game.physics.enable(newBrick, Phaser.Physics.ARCADE);
+              newBrick.body.immovable = true;
+              newBrick.anchor.set(0.5);
+              bricks.add(newBrick);
+            }
+          }
+        }
+      }
+
+      function ballHitBrick(ball, brick) {
+        brick.kill();
+        score += 10;
+        scoreText.setText(`Points: ${score}`);
+        game.stage.backgroundColor = Phaser.ArrayUtils.getRandomItem(backgroundColors);
+        game.sound.play('brickHit');
+
+        if (Math.random() < 0.2) {
+          createPowerUp(brick.x, brick.y);
+        }
+
+        if (bricks.countLiving() === 0) {
+          if (currentLevel < levels.length - 1) {
+            currentLevel++;
+            resetLevel();
+          } else {
+            if (score > highScore) {
+              highScore = score;
+              localStorage.setItem('highScore', highScore);
+            }
+            alert("You won the game, congratulations!");
+            location.reload();
+          }
+        }
+      }
+
+      function ballLeaveScreen(ball) {
+        ball.kill();
+        lives--;
+        if (lives) {
+            livesText.setText(`Lives: ${lives}`);
+            lifeLostText.visible = true;
+            resetBalls();
+            paddle.reset(game.world.width * 0.5, game.world.height - 5);
+            game.input.onDown.addOnce(() => {
+                lifeLostText.visible = false;
+                balls.forEach(function(ball) {
+                    ball.body.velocity.set(150, -150 * (Math.random() > 0.5 ? 1 : -1));
+                });
+            }, this);
+        } else {
+            if (score > highScore) {
+              highScore = score;
+              localStorage.setItem('highScore', highScore);
+            }
+            game.sound.play('gameOver');
+            alert("You lost, game over!");
+            location.reload();
+        }
+      }
+
+      function ballHitPaddle(ball, paddle) {
+        ball.body.velocity.x = -5 * (paddle.x - ball.x);
+        game.sound.play('hit');
+      }
+
+      function startGame() {
+        startButton.destroy();
+        balls.forEach(function(ball) {
+            ball.body.velocity.set(150, -150 * (Math.random() > 0.5 ? 1 : -1));
+        });
+        playing = true;
+      }
+
+      function resetLevel() {
+        bricks.removeAll();
+        initBricks();
+        resetBalls();
+        paddle.reset(game.world.width * 0.5, game.world.height - 5);
+        game.input.onDown.addOnce(() => {
+            balls.forEach(function(ball) {
+                ball.body.velocity.set(150, -150 * (Math.random() > 0.5 ? 1 : -1));
+            });
+            playing = true;
+        }, this);
+      }
+
+      function resetBalls() {
+        balls.removeAll();
+        createBall(game.world.width * 0.5, game.world.height - 25);
+        createBall(game.world.width * 0.5, game.world.height - 75); // Second ball
+      }
+
+      function createPowerUp(x, y) {
+        let powerUpType = Phaser.ArrayUtils.getRandomItem(powerUpTypes);
+        let powerUp = powerUps.create(x, y, powerUpType);
+        powerUp.anchor.set(0.5);
+        powerUp.body.gravity.y = 100;
+      }
+
+      function collectPowerUp(paddle, powerUp) {
+        switch (powerUp.key) {
+          case 'extraLife':
+            lives++;
+            livesText.setText(`Lives: ${lives}`);
+            break;
+          case 'largerPaddle':
+            paddle.scale.x = 1.5;
+            game.time.events.add(Phaser.Timer.SECOND * 10, () => {
+              paddle.scale.x = 1;
+            }, this);
+            break;
+          case 'multiBall':
+            createBall(game.world.width * 0.5, game.world.height - 25);
+            break;
+        }
+        powerUp.kill();
+      }
+    </script>
+</body>
+</html>
