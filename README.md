@@ -28,9 +28,9 @@ Data tells a story, and with the right tools, we can uncover the narratives hidd
   - Developing a 'shiny' app for interactive data exploration
 
 #### Report and Script
-- [R Project File](./Assessment%202%20-%20Data%20Visualisation.Rproj): The project file for RStudio.
+- [R Project File](./Assessment%202%20-%20Data%20Visualisation.Rproj): The project file for RStudio.(Contains the script containing all data processing and visualization code.)
 - [Data Visualization Report](./Assessment_2_Data_VisualisationReport.pdf): A comprehensive report detailing the findings and visualizations.
-- [R Script](./Assessment2.R): The script containing all data processing and visualization code.
+
 
 #### Data Files
 **These files were used to explore and analyze the data:**
